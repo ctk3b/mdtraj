@@ -25,3 +25,7 @@ def test_element_guessing():
     assert element.get_by_symbol("H2'1") == element.hydrogen
     assert element.get_by_symbol("O1P") == element.oxygen
     assert element.get_by_symbol("H62") == element.hydrogen
+    assert element.get_by_symbol("asdfasd") == element.virtual_site
+
+    # This is the current expected behavior.
+    assert element.get_by_symbol("Ca") == element.carbon
