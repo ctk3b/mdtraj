@@ -114,18 +114,38 @@ class Element(tuple):
 
     @staticmethod
     def getBySymbol(symbol):
-        """Get the Element with a particular chemical symbol
+        """Determine the element based on the name of an atom.
+
+        This is very naive. It first tries to match the first letter of the
+        element. If that doesn't work, it tries to match the first *two*
+        letters. If that still doesn't work, it defaults to an extra point.
 
         Parameters
         ----------
         symbol : str
+            Symbol used to describe the atom to determine an element for
 
         Returns
         -------
         element : Element
+
+        Notes
+        -----
+        This should be a last-case scenario for guessing element information.
+        For instance, Ca will never be matched, since calcium atoms will be
+        tagged as carbon before the second letter is tried. This is usually OK
+        for biomolecules, but you are better off using the mass or, even better,
+        an appropriate representation of the atomic number to begin with.
         """
-        s = symbol.strip().upper()
-        return Element._elements_by_symbol[s]
+        try:
+            return Element._elements_by_symbol[symbol.strip()[0].upper()]
+        except KeyError:
+            sym = symbol.strip()[:2]
+        try:
+            sym = '%s%s' % (sym[0].upper(), sym[1].lower())
+            return Element._elements_by_symbol[sym]
+        except (KeyError, IndexError):
+            return virtual_site  # give up
 
     @staticmethod
     def getByAtomicNumber(number):
@@ -223,12 +243,9 @@ class Element(tuple):
         return bool(self.mass)
 
 
-
 # This is for backward compatibility.
 def get_by_symbol(symbol):
-    s = symbol.strip().upper()
-    return Element._elements_by_symbol[s]
-
+    return Element.getBySymbol(symbol)
 
 
 # van der Waals radii are taken from A. Bondi,
